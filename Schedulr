@@ -30,10 +30,23 @@ def find_free_times(schedule, start_of_day="07:00", end_of_day="21:00"):
 
     return free_times
 
-# Example schedule: [(start_time, end_time), ...]
-schedule = [("09:00", "10:30"), ("12:00", "13:00"), ("15:00", "16:00")]
+# Get user input for 7-day schedule
+week_schedule = {}
 
-free_times = find_free_times(schedule)
+days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-print("Free times:", free_times)
+for day in days_of_week:
+    print(f"Enter schedule for {day} (format: start-end, comma-separated):")
+    daily_input = input().strip()
+    if daily_input:
+        daily_events = [tuple(event.split("-")) for event in daily_input.split(",")]
+    else:
+        daily_events = []
+    week_schedule[day] = daily_events
+
+# Calculate and display free times for each day
+for day, schedule in week_schedule.items():
+    free_times = find_free_times(schedule)
+    print(f"Free times on {day}: {free_times}")
+
 
