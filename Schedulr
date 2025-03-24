@@ -1,0 +1,39 @@
+#user inputs their schedule (need a UI for this)
+#function to convert the times to military time
+
+from datetime import datetime, timedelta
+
+# Helper function to convert time strings to datetime objects
+def time_to_datetime(time_str):
+    return datetime.strptime(time_str, "%H:%M")
+
+# Function to find free times in a schedule
+def find_free_times(schedule, start_of_day="07:00", end_of_day="21:00"):
+    start_of_day = time_to_datetime(start_of_day)
+    end_of_day = time_to_datetime(end_of_day)
+
+    # Convert schedule times to datetime objects
+    schedule = [(time_to_datetime(start), time_to_datetime(end)) for start, end in schedule]
+    schedule.sort()  # Ensure events are in order
+
+    free_times = []
+    current_start = start_of_day
+
+    for start, end in schedule:
+        if current_start < start:
+            free_times.append((current_start.strftime("%H:%M"), start.strftime("%H:%M")))
+        current_start = max(current_start, end)
+
+    # Check for free time after last event
+    if current_start < end_of_day:
+        free_times.append((current_start.strftime("%H:%M"), end_of_day.strftime("%H:%M")))
+
+    return free_times
+
+# Example schedule: [(start_time, end_time), ...]
+schedule = [("09:00", "10:30"), ("12:00", "13:00"), ("15:00", "16:00")]
+
+free_times = find_free_times(schedule)
+
+print("Free times:", free_times)
+
