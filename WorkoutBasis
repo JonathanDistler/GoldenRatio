@@ -1,0 +1,41 @@
+def generate_workout(bmi_category):
+    workouts = {
+        'Underweight': [
+            "Day 1: Strength Training - Squats (3x8), Deadlifts (3x8), Bench Press (3x8), Pull-Ups (3x6), Plank (3x30s)",
+            "Day 2: Moderate Cardio - Light jog (20 mins), Cycling (15 mins), Jump Rope (3x1 min), Core: Leg Raises (3x10), Russian Twists (3x20)",
+            "Day 3: Strength Training - Lunges (3x10), Rows (3x8), Overhead Press (3x8), Bicep Curls (3x10), Side Planks (3x20s)",
+            "Day 4: Full Body - Kettlebell Swings (3x15), Push-Ups (3x10), Squat to Press (3x10), Burpees (3x8), Mountain Climbers (3x30s)",
+            "Day 5: Active Recovery - Yoga (15 mins), Walk (30 mins), Stretching (10 mins)"
+        ],
+        'Normal': [
+            "Day 1: Strength Training - Squats (3x10), Deadlifts (3x10), Push-Ups (3x15), Bent Over Rows (3x10), Plank (3x45s)",
+            "Day 2: HIIT - Jumping Jacks (30s), Mountain Climbers (30s), High Knees (30s), Push-Ups (30s), Rest (30s) x 4 rounds",
+            "Day 3: Strength Focus - Lunges (3x10), Pull-Ups (3x6), Shoulder Press (3x10), Kettlebell Swings (3x15), Side Planks (3x30s)",
+            "Day 4: Cardio & Core - Rowing (15 mins), Cycling (20 mins), Russian Twists (3x20), Bicycle Crunches (3x15), Supermans (3x15)",
+            "Day 5: Flexibility & Mobility - Yoga (20 mins), Foam Rolling (10 mins), Stretching (10 mins)"
+        ],
+        'Overweight': [
+            "Day 1: Low-Impact Cardio - Brisk Walk (30 mins), Swimming (20 mins), Step-Ups (3x10), Wall Push-Ups (3x10), Side Leg Raises (3x12)",
+            "Day 2: Strength - Squats (3x10), Resistance Band Rows (3x10), Glute Bridges (3x10), Seated Shoulder Press (3x10), Plank (3x20s)",
+            "Day 3: Cardio Circuit - Walk (15 mins), Marching in Place (3x1 min), Chair Step-Ups (3x10), Bird-Dogs (3x10), Side Planks (3x20s)",
+            "Day 4: Strength & Core - Kettlebell Deadlifts (3x10), Seated Rows (3x10), Wall Sit (3x20s), Russian Twists (3x15), Superman Hold (3x20s)",
+            "Day 5: Recovery - Swimming (20 mins), Walking (20 mins), Yoga (10 mins), Stretching (10 mins)"
+        ],
+        'Obese': [
+            "Day 1: Low-Impact Cardio - Walk (30 mins), Swimming (20 mins), Wall Sit (3x20s), Chair Squats (3x8), Seated Side Leg Lifts (3x10)",
+            "Day 2: Strength Focus - Wall Push-Ups (3x10), Resistance Band Rows (3x10), Chair-Assisted Lunges (3x8), Glute Bridges (3x10), Plank (3x15s)",
+            "Day 3: Cardio Circuit - Marching in Place (3x1 min), Side Steps (3x20), Step-Ups (3x10), Bird-Dogs (3x8), Side Planks (3x15s)",
+            "Day 4: Strength & Core - Bodyweight Squats (3x8), Seated Shoulder Press (3x10), Resistance Rows (3x10), Russian Twists (3x15), Supermans (3x10)",
+            "Day 5: Recovery - Yoga (15 mins), Light Walk (30 mins), Stretching (10 mins)"
+        ]
+    }
+
+    if bmi_category not in workouts:
+        return "Invalid BMI category. Choose from 'Underweight', 'Normal', 'Overweight', or 'Obese'."
+
+    return f"Workout Plan for {bmi_category} BMI:\n" + "\n".join(workouts[bmi_category])
+
+
+# Example usage
+bmi_category = input("Enter BMI category (Underweight, Normal, Overweight, Obese): ").capitalize()
+print(generate_workout(bmi_category))
