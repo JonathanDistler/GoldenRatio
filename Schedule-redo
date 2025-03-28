@@ -1,81 +1,57 @@
-def get_user_schedule():
-    schedule = {day: [] for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+import tkinter as tk
+from tkinter import messagebox
+
+class ExerciseScheduler:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Exercise Scheduler")
+        self.root.configure(bg="#f4f4f4")
+        
+        self.days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        self.time_slots = [f"{h}:{m:02d}" for h in range(6, 22) for m in (0, 30)]
+        self.available_slots = set()
+        
+        self.create_ui()
     
-    print("Enter your schedule. Type 'done' to finish.")
-    while True:
-        entry = input("Enter a busy time in the format 'Day HH:MM-HH:MM' (e.g., Monday 09:00-11:00): ")
-        if entry.lower() == 'done':
-            break
-        try:
-            day, time_range = entry.split(" ")
-            start, end = time_range.split("-")
-            if day in schedule:
-                schedule[day].append((start, end))
+    def toggle_slot(self, day, time):
+        key = (day, time)
+        if key in self.available_slots:
+            self.available_slots.remove(key)
+        else:
+            self.available_slots.add(key)
+        self.update_buttons()
+    
+    def update_buttons(self):
+        for (day, time), btn in self.buttons.items():
+            if (day, time) in self.available_slots:
+                btn.config(bg="#4CAF50", fg="white")  # Green for available
             else:
-                print("Invalid day. Try again.")
-        except ValueError:
-            print("Invalid format. Try again.")
+                btn.config(bg="lightgray", fg="black")  # Gray for unselected
     
-    return schedule
-
-def get_unrealistic_times():
-    unrealistic_times = []
-    print("Enter times when you are technically free but unlikely to do anything (e.g., sleeping hours). Type 'done' to finish.")
-    while True:
-        entry = input("Enter an unrealistic time in the format 'Day HH:MM-HH:MM' (e.g., Monday 00:00-06:00): ")
-        if entry.lower() == 'done':
-            break
-        try:
-            day, time_range = entry.split(" ")
-            start, end = time_range.split("-")
-            unrealistic_times.append((day, start, end))
-        except ValueError:
-            print("Invalid format. Try again.")
+    def submit_times(self):
+        available_slots = sorted(self.available_slots, key=lambda x: (self.days.index(x[0]), self.time_slots.index(x[1])))
+        formatted_slots = [f"{day} at {time}" for day, time in available_slots]
+        messagebox.showinfo("Saved Times", "Feasible exercise times:\n" + "\n".join(formatted_slots))
+        print("Feasible exercise times:")
+        print("\n".join(formatted_slots))
     
-    return unrealistic_times
-
-def find_free_time(schedule, unrealistic_times):
-    full_day = [("00:00", "23:59")]
-    free_schedule = {}
-    
-    for day, busy_times in schedule.items():
-        busy_times.sort()
-        free_times = []
-        start_of_day = "00:00"
+    def create_ui(self):
+        self.buttons = {}
+        tk.Label(self.root, text="Select Your Available Workout Times", font=("Arial", 14, "bold"), bg="#f4f4f4").grid(row=0, columnspan=8, pady=10)
         
-        for start, end in busy_times:
-            if start > start_of_day:
-                free_times.append((start_of_day, start))
-            start_of_day = end
+        for col, day in enumerate(self.days, start=1):
+            tk.Label(self.root, text=day, font=("Arial", 10, "bold"), bg="#f4f4f4").grid(row=1, column=col, padx=5, pady=5)
         
-        if start_of_day < "23:59":
-            free_times.append((start_of_day, "23:59"))
+        for row, time in enumerate(self.time_slots, start=2):
+            tk.Label(self.root, text=time, font=("Arial", 9), bg="#f4f4f4").grid(row=row, column=0, padx=5, pady=2)
+            for col, day in enumerate(self.days, start=1):
+                btn = tk.Button(self.root, width=6, height=1, bg="lightgray", command=lambda d=day, t=time: self.toggle_slot(d, t))
+                btn.grid(row=row, column=col, padx=1, pady=1)
+                self.buttons[(day, time)] = btn
         
-        # Filter out unrealistic times
-        filtered_free_times = []
-        for free_start, free_end in free_times:
-            for u_day, u_start, u_end in unrealistic_times:
-                if day == u_day and not (free_end <= u_start or free_start >= u_end):
-                    if free_start < u_start:
-                        filtered_free_times.append((free_start, u_start))
-                    if free_end > u_end:
-                        filtered_free_times.append((u_end, free_end))
-                    break
-            else:
-                filtered_free_times.append((free_start, free_end))
-        
-        free_schedule[day] = filtered_free_times if filtered_free_times else [("Free all day",)]
-    
-    return free_schedule
-
-def main():
-    user_schedule = get_user_schedule()
-    unrealistic_times = get_unrealistic_times()
-    free_times = find_free_time(user_schedule, unrealistic_times)
-    
-    print("\nYour free times:")
-    for day, times in free_times.items():
-        print(f"{day}: {', '.join(['-'.join(time) for time in times])}")
+        tk.Button(self.root, text="Submit", command=self.submit_times, bg="#007BFF", fg="white", font=("Arial", 12, "bold"), padx=10, pady=5).grid(row=len(self.time_slots) + 2, columnspan=8, pady=15)
 
 if __name__ == "__main__":
-    main()
+    root = tk.Tk()
+    app = ExerciseScheduler(root)
+    root.mainloop()
