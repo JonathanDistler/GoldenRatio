@@ -37,10 +37,22 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
+# Function to process uploaded image
+def process_uploaded_image(image_path):
+    """Loads an uploaded image, converts it to RGB, and applies necessary transformations."""
+    try:
+        image = Image.open(image_path).convert("RGB")
+        image = transform(image).unsqueeze(0)  # Add batch dimension
+        return image
+    except Exception as e:
+        print(f"Error processing image: {e}")
+        return None
+
 # Function to predict BMI
 def predict_bmi(image_path):
-    image = Image.open(image_path).convert("RGB")
-    image = transform(image).unsqueeze(0)
+    image = process_uploaded_image(image_path)
+    if image is None:
+        return None
     
     with torch.no_grad():
         bmi_prediction = model(image).item()
@@ -61,6 +73,9 @@ def classify_bmi(bmi):
 if __name__ == "__main__":
     image_path = input("Enter the path to your image: ")
     bmi = predict_bmi(image_path)
-    category = classify_bmi(bmi)
-    print(f"Predicted BMI: {bmi:.2f}")
-    print(f"Category: {category}")
+    if bmi is not None:
+        category = classify_bmi(bmi)
+        print(f"Predicted BMI: {bmi:.2f}")
+        print(f"Category: {category}")
+    else:
+        print("Failed to process image.")
