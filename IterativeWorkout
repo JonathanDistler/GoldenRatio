@@ -1,0 +1,61 @@
+def generate_specific_workouts(bmi_category: str, days_available: int, free_hours: float):
+    """
+    Generates a detailed workout plan including RPE, exercise name, and duration, ensuring it fits within available time.
+    Iteratively increases difficulty over 8 weeks before resetting with a new focus.
+    
+    Args:
+        bmi_category (str): The user's BMI classification.
+        days_available (int): The number of days the user can work out per week.
+        free_hours (float): The maximum free time available for exercise per day.
+    
+    Returns:
+        dict: A detailed workout plan with specific exercises over 8 weeks.
+    """
+    workout_schedule = prioritize_workouts(bmi_category, days_available)
+    
+    exercises = {
+        'strength': [
+            {'name': 'Squats', 'RPE': 7, 'duration': 30},
+            {'name': 'Bench Press', 'RPE': 8, 'duration': 30},
+            {'name': 'Deadlifts', 'RPE': 9, 'duration': 30},
+            {'name': 'Pull-Ups', 'RPE': 8, 'duration': 25},
+            {'name': 'Lunges', 'RPE': 7, 'duration': 30},
+            {'name': 'Overhead Press', 'RPE': 8, 'duration': 25}
+        ],
+        'cardio': [
+            {'name': 'Running', 'RPE': 6, 'duration': 45},
+            {'name': 'Cycling', 'RPE': 5, 'duration': 40},
+            {'name': 'Rowing', 'RPE': 7, 'duration': 35},
+            {'name': 'Jump Rope', 'RPE': 8, 'duration': 20},
+            {'name': 'Swimming', 'RPE': 6, 'duration': 50}
+        ],
+        'flexibility': [
+            {'name': 'Yoga', 'RPE': 4, 'duration': 30},
+            {'name': 'Dynamic Stretching', 'RPE': 3, 'duration': 20},
+            {'name': 'Pilates', 'RPE': 5, 'duration': 30}
+        ]
+    }
+    
+    detailed_plan = {}
+    max_minutes = free_hours * 60  # Convert free hours to minutes
+    
+    for week in range(1, 9):  # 8-week cycle
+        week_plan = {}
+        for day, workout_type in workout_schedule.items():
+            selected_exercises = []
+            total_duration = 0
+            
+            for exercise in exercises[workout_type]:
+                adjusted_exercise = exercise.copy()
+                adjusted_exercise['RPE'] = min(10, exercise['RPE'] + (week // 2))  # Increase difficulty gradually
+                adjusted_exercise['duration'] = min(max_minutes, exercise['duration'] + (week * 2))  # Small duration increase
+                
+                if total_duration + adjusted_exercise['duration'] <= max_minutes:
+                    selected_exercises.append(adjusted_exercise)
+                    total_duration += adjusted_exercise['duration']
+            
+            week_plan[day] = selected_exercises
+        
+        detailed_plan[f'Week {week}'] = week_plan
+    
+    return detailed_plan
