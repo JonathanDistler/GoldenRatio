@@ -1,0 +1,81 @@
+def get_user_schedule():
+    schedule = {day: [] for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+    
+    print("Enter your schedule. Type 'done' to finish.")
+    while True:
+        entry = input("Enter a busy time in the format 'Day HH:MM-HH:MM' (e.g., Monday 09:00-11:00): ")
+        if entry.lower() == 'done':
+            break
+        try:
+            day, time_range = entry.split(" ")
+            start, end = time_range.split("-")
+            if day in schedule:
+                schedule[day].append((start, end))
+            else:
+                print("Invalid day. Try again.")
+        except ValueError:
+            print("Invalid format. Try again.")
+    
+    return schedule
+
+def get_unrealistic_times():
+    unrealistic_times = []
+    print("Enter times when you are technically free but unlikely to do anything (e.g., sleeping hours). Type 'done' to finish.")
+    while True:
+        entry = input("Enter an unrealistic time in the format 'Day HH:MM-HH:MM' (e.g., Monday 00:00-06:00): ")
+        if entry.lower() == 'done':
+            break
+        try:
+            day, time_range = entry.split(" ")
+            start, end = time_range.split("-")
+            unrealistic_times.append((day, start, end))
+        except ValueError:
+            print("Invalid format. Try again.")
+    
+    return unrealistic_times
+
+def find_free_time(schedule, unrealistic_times):
+    full_day = [("00:00", "23:59")]
+    free_schedule = {}
+    
+    for day, busy_times in schedule.items():
+        busy_times.sort()
+        free_times = []
+        start_of_day = "00:00"
+        
+        for start, end in busy_times:
+            if start > start_of_day:
+                free_times.append((start_of_day, start))
+            start_of_day = end
+        
+        if start_of_day < "23:59":
+            free_times.append((start_of_day, "23:59"))
+        
+        # Filter out unrealistic times
+        filtered_free_times = []
+        for free_start, free_end in free_times:
+            for u_day, u_start, u_end in unrealistic_times:
+                if day == u_day and not (free_end <= u_start or free_start >= u_end):
+                    if free_start < u_start:
+                        filtered_free_times.append((free_start, u_start))
+                    if free_end > u_end:
+                        filtered_free_times.append((u_end, free_end))
+                    break
+            else:
+                filtered_free_times.append((free_start, free_end))
+        
+        free_schedule[day] = filtered_free_times if filtered_free_times else [("Free all day",)]
+    
+    return free_schedule
+
+def main():
+    user_schedule = get_user_schedule()
+    unrealistic_times = get_unrealistic_times()
+    free_times = find_free_time(user_schedule, unrealistic_times)
+    
+    print("\nYour free times:")
+    for day, times in free_times.items():
+        print(f"{day}: {', '.join(['-'.join(time) for time in times])}")
+
+if __name__ == "__main__":
+    main()
