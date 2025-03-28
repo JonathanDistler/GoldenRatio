@@ -1,0 +1,34 @@
+def prioritize_workouts(bmi_category: str, days_available: int):
+    """
+    Prioritizes workouts based on BMI category and available exercise days.
+    
+    Args:
+        bmi_category (str): The user's BMI classification ('Underweight', 'Normal', 'Overweight', 'Obese').
+        days_available (int): The number of days the user can exercise per week.
+    
+    Returns:
+        dict: A structured workout schedule prioritizing necessary fitness areas.
+    """
+    # Define workout distribution based on BMI category
+    workout_priorities = {
+        'Underweight': {'strength': 0.6, 'cardio': 0.3, 'flexibility': 0.1},
+        'Normal': {'strength': 0.4, 'cardio': 0.4, 'flexibility': 0.2},
+        'Overweight': {'strength': 0.3, 'cardio': 0.6, 'flexibility': 0.1},
+        'Obese': {'strength': 0.2, 'cardio': 0.7, 'flexibility': 0.1}
+    }
+    
+    if bmi_category not in workout_priorities:
+        raise ValueError("Invalid BMI category. Choose from 'Underweight', 'Normal', 'Overweight', or 'Obese'.")
+    
+    # Get priority percentages
+    priorities = workout_priorities[bmi_category]
+    
+    # Allocate workout days based on priority
+    strength_days = round(priorities['strength'] * days_available)
+    cardio_days = round(priorities['cardio'] * days_available)
+    flexibility_days = max(1, days_available - (strength_days + cardio_days))  # Ensure at least 1 flexibility day
+    
+    # Create workout schedule
+    workout_schedule = schedule(strength_days, cardio_days, flexibility_days)  # Uses predefined schedule function
+    
+    return workout_schedule
