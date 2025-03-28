@@ -1,0 +1,66 @@
+import torch
+from torchvision import transforms
+from PIL import Image
+import os
+import subprocess
+
+# Credit: The model used in this script is developed by liujie-zheng (https://github.com/liujie-zheng/face-to-bmi-vit)
+# This script sets up the face-to-bmi-vit model, loads a pre-trained ViT model for BMI estimation, processes images, and classifies BMI.
+
+def setup_model():
+    # Clone the repository if it doesn't exist
+    if not os.path.exists("face-to-bmi-vit"):
+        print("Cloning the face-to-bmi-vit repository...")
+        subprocess.run(["git", "clone", "https://github.com/liujie-zheng/face-to-bmi-vit.git"], check=True)
+    
+    # Install dependencies
+    print("Installing required packages...")
+    subprocess.run(["pip", "install", "torch", "torchvision", "timm", "numpy", "pillow"], check=True)
+    
+    # Set model path
+    model_path = "face-to-bmi-vit/bmi_vit.pth"
+    if not os.path.exists(model_path):
+        print("Error: Pre-trained model weights not found. Please download and place the model in face-to-bmi-vit directory.")
+        exit()
+    
+    return model_path
+
+# Load the pre-trained model
+MODEL_PATH = setup_model()
+model = torch.load(MODEL_PATH, map_location=torch.device('cpu'))
+model.eval()
+
+# Define image preprocessing
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
+
+# Function to predict BMI
+def predict_bmi(image_path):
+    image = Image.open(image_path).convert("RGB")
+    image = transform(image).unsqueeze(0)
+    
+    with torch.no_grad():
+        bmi_prediction = model(image).item()
+    
+    return bmi_prediction
+
+# Function to classify BMI category
+def classify_bmi(bmi):
+    if bmi < 18.5:
+        return "Underweight"
+    elif 18.5 <= bmi < 24.9:
+        return "Normal weight"
+    elif 25 <= bmi < 29.9:
+        return "Overweight"
+    else:
+        return "Obese"
+
+if __name__ == "__main__":
+    image_path = input("Enter the path to your image: ")
+    bmi = predict_bmi(image_path)
+    category = classify_bmi(bmi)
+    print(f"Predicted BMI: {bmi:.2f}")
+    print(f"Category: {category}")
