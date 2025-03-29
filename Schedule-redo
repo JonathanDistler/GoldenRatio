@@ -8,8 +8,10 @@ class ExerciseScheduler:
         self.root.configure(bg="#f4f4f4")
         
         self.days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        self.time_slots = [f"{h}:{m:02d}" for h in range(6, 22) for m in (0, 30)]
+        self.time_slots = [f"{h % 12 if h % 12 else 12}:{m:02d} {'AM' if h < 12 else 'PM'}" for h in range(6, 22) for m in (0, 30)]
         self.available_slots = set()
+        self.unavailable_slots = set()
+        self.is_dragging = False
         
         self.create_ui()
     
@@ -17,39 +19,81 @@ class ExerciseScheduler:
         key = (day, time)
         if key in self.available_slots:
             self.available_slots.remove(key)
+            self.unavailable_slots.add(key)
+        elif key in self.unavailable_slots:
+            self.unavailable_slots.remove(key)
         else:
             self.available_slots.add(key)
         self.update_buttons()
+    
+    def start_drag(self, day, time):
+        self.is_dragging = True
+        self.toggle_slot(day, time)
+    
+    def stop_drag(self, event):
+        self.is_dragging = False
+    
+    def drag_toggle(self, day, time):
+        if self.is_dragging:
+            self.toggle_slot(day, time)
     
     def update_buttons(self):
         for (day, time), btn in self.buttons.items():
             if (day, time) in self.available_slots:
                 btn.config(bg="#4CAF50", fg="white")  # Green for available
+            elif (day, time) in self.unavailable_slots:
+                btn.config(bg="#D9534F", fg="white")  # Red for unavailable
             else:
                 btn.config(bg="lightgray", fg="black")  # Gray for unselected
     
     def submit_times(self):
         available_slots = sorted(self.available_slots, key=lambda x: (self.days.index(x[0]), self.time_slots.index(x[1])))
         formatted_slots = [f"{day} at {time}" for day, time in available_slots]
+        
+        with open("exercise_schedule.txt", "w") as file:
+            file.write("Feasible exercise times:\n" + "\n".join(formatted_slots))
+        
         messagebox.showinfo("Saved Times", "Feasible exercise times:\n" + "\n".join(formatted_slots))
-        print("Feasible exercise times:")
-        print("\n".join(formatted_slots))
     
     def create_ui(self):
         self.buttons = {}
-        tk.Label(self.root, text="Select Your Available Workout Times", font=("Arial", 14, "bold"), bg="#f4f4f4").grid(row=0, columnspan=8, pady=10)
+
+        frame = tk.Frame(self.root)
+        frame.pack(fill=tk.BOTH, expand=True)
+
+        canvas = tk.Canvas(frame)
+        scrollbar = tk.Scrollbar(frame, orient=tk.VERTICAL, command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+            )
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        tk.Label(scrollable_frame, text="Select Your Available Workout Times", font=("Arial", 18, "bold"), bg="#f4f4f4").grid(row=0, columnspan=8, pady=10)
         
         for col, day in enumerate(self.days, start=1):
-            tk.Label(self.root, text=day, font=("Arial", 10, "bold"), bg="#f4f4f4").grid(row=1, column=col, padx=5, pady=5)
+            tk.Label(scrollable_frame, text=day, font=("Arial", 12, "bold"), bg="#f4f4f4").grid(row=1, column=col, padx=15, pady=5)
         
         for row, time in enumerate(self.time_slots, start=2):
-            tk.Label(self.root, text=time, font=("Arial", 9), bg="#f4f4f4").grid(row=row, column=0, padx=5, pady=2)
+            tk.Label(scrollable_frame, text=time, font=("Arial", 10), bg="#f4f4f4").grid(row=row, column=0, padx=5, pady=2)
             for col, day in enumerate(self.days, start=1):
-                btn = tk.Button(self.root, width=6, height=1, bg="lightgray", command=lambda d=day, t=time: self.toggle_slot(d, t))
-                btn.grid(row=row, column=col, padx=1, pady=1)
+                btn = tk.Button(scrollable_frame, width=15, height=1, bg="lightgray")
+                btn.grid(row=row, column=col, padx=5, pady=2)
+                btn.bind("<ButtonPress-1>", lambda e, d=day, t=time: self.start_drag(d, t))
+                btn.bind("<B1-Motion>", lambda e, d=day, t=time: self.drag_toggle(d, t))
+                btn.bind("<ButtonRelease-1>", self.stop_drag)
                 self.buttons[(day, time)] = btn
         
-        tk.Button(self.root, text="Submit", command=self.submit_times, bg="#007BFF", fg="white", font=("Arial", 12, "bold"), padx=10, pady=5).grid(row=len(self.time_slots) + 2, columnspan=8, pady=15)
+        tk.Button(scrollable_frame, text="Submit", command=self.submit_times, bg="#007BFF", fg="white", font=("Arial", 14, "bold"), padx=15, pady=8).grid(row=len(self.time_slots) + 2, columnspan=8, pady=15)
 
 if __name__ == "__main__":
     root = tk.Tk()
