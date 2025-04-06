@@ -1,0 +1,15 @@
+def determine_sets_and_reps(exercise_type):
+    """
+    Determines the appropriate number of sets and reps based on exercise type.
+    
+    :param exercise_type: Type of exercise (strength, conditioning, toning, cardio)
+    :return: Tuple containing (sets, reps)
+    """
+    type_mapping = {
+        "strength": (3, 5),  # Lower reps, higher intensity
+        "conditioning": (5, 12),  # Higher reps and sets
+        "toning": (4, 15),  # Moderate sets, higher reps
+        "cardio": (3, 20)  # High reps for endurance
+    }
+    
+    return type_mapping.get(exercise_type.lower(), "Invalid exercise type")
