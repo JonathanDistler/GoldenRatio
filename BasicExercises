@@ -1,0 +1,6 @@
+"legs": ["Squat", "Leg Press", "Lunges", "Leg Curl", "Leg Extension", "Calf Raise", "Step-ups", "Bulgarian Split Squat", "Sumo Deadlift"],
+"back": ["Deadlift", "Pull-up", "Bent-over Row", "Lat Pulldown", "Seated Row", "Face Pull", "T-Bar Row", "Rack Pull", "Reverse Fly"],
+"arms": ["Bicep Curl", "Triceps Dips", "Hammer Curl", "Triceps Pushdown", "Preacher Curl", "Concentration Curl", "Overhead Triceps Extension", "Zottman Curl"],
+"chest": ["Bench Press", "Incline Bench Press", "Dumbbell Fly", "Chest Press", "Push-ups", "Cable Crossover", "Dips", "Pec Deck Machine"],
+"shoulders": ["Overhead Press", "Lateral Raise", "Front Raise", "Face Pull", "Arnold Press", "Upright Row", "Reverse Pec Deck", "Dumbbell Shrugs"],
+"core": ["Plank", "Hanging Leg Raise", "Russian Twist", "Sit-ups", "Bicycle Crunch", "Cable Woodchopper", "Ab Rollout", "V-ups"]
