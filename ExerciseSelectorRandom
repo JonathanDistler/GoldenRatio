@@ -1,4 +1,4 @@
-def get_random_exercises(num_exercises_per_category):
+def get_random_exercises(num_exercises_per_category, exercise_list):
     """
     Selects a user-specified number of random exercises from each category.
     
