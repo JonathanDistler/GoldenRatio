@@ -1,0 +1,38 @@
+def ai_generate_sets_reps(exercises, goal, experience_level, frequency):
+    """
+    AI-based function to generate an optimized workout plan with sets and reps based on the user's goals, experience, and frequency.
+    
+    :param exercises: List of exercises selected by the user
+    :param goal: User's goal (e.g., lose weight, gain muscle, increase endurance, improve strength)
+    :param experience_level: User's experience level (beginner, intermediate, advanced)
+    :param frequency: How often the user works out per week
+    :return: Dictionary mapping exercises to (sets, reps)
+    """
+    # Define baseline sets and reps based on goal
+    goal_mapping = {
+        "lose weight": (3, 15),  # Higher reps, moderate sets
+        "gain muscle": (4, 8),  # Moderate reps and sets
+        "increase endurance": (3, 20),  # High reps, lower sets
+        "improve strength": (5, 5),  # Low reps, high sets
+    }
+    
+    sets, reps = goal_mapping.get(goal.lower(), (3, 10))  # Default to 3x10 if goal is unknown
+    
+    # Adjust based on experience level
+    experience_adjustments = {
+        "beginner": (-1, +2),  # Reduce sets, increase reps slightly
+        "intermediate": (0, 0),  # No change
+        "advanced": (+1, -2),  # Increase sets, reduce reps slightly
+    }
+    
+    set_adj, rep_adj = experience_adjustments.get(experience_level.lower(), (0, 0))
+    sets = max(1, sets + set_adj)  # Ensure at least 1 set
+    reps = max(1, reps + rep_adj)  # Ensure at least 1 rep
+    
+    # Modify for workout frequency
+    if frequency >= 5:
+        sets += 1  # Increase sets for higher frequency
+    elif frequency <= 2:
+        reps += 2  # Increase reps for lower frequency workouts
+    
+    return {exercise: (sets, reps) for exercise in exercises}
