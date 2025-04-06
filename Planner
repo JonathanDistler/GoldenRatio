@@ -1,0 +1,61 @@
+import random
+
+def get_training_method(method):
+    training_methods = {
+        "Push-Pull-Legs": {
+            "Push": ["Chest", "Shoulders", "Triceps"],
+            "Pull": ["Back", "Biceps"],
+            "Legs": ["Quadriceps", "Hamstrings", "Glutes", "Calves"],
+        },
+        "Back-Biceps Chest-Triceps Legs": {
+            "Back & Biceps": ["Back", "Biceps"],
+            "Chest & Triceps": ["Chest", "Triceps"],
+            "Legs": ["Quadriceps", "Hamstrings", "Glutes", "Calves"],
+        },
+        "Arms Focus": {
+            "Arms": ["Biceps", "Triceps", "Forearms"],
+            "Legs": ["Quadriceps", "Hamstrings", "Glutes", "Calves"],
+        },
+    }
+    return training_methods.get(method, {})
+
+def generate_workout_plan(method):
+    muscle_groups = get_training_method(method)
+    workout_plan = {}
+    
+    for day, muscles in muscle_groups.items():
+        workout_plan[day] = {muscle: [] for muscle in muscles}
+    
+    return workout_plan
+
+def assign_exercises(workout_plan, exercise_pool):
+    """
+    Assigns random exercises from the pool to each muscle group without showing the user.
+    """
+    for day, muscle_groups in workout_plan.items():
+        for muscle in muscle_groups:
+            if muscle in exercise_pool:
+                workout_plan[day][muscle] = random.sample(exercise_pool[muscle], min(3, len(exercise_pool[muscle])))
+    return workout_plan
+
+# Example exercise pool
+exercise_pool = {
+    "Chest": ["Bench Press", "Incline Dumbbell Press", "Chest Fly"],
+    "Shoulders": ["Overhead Press", "Lateral Raises", "Face Pulls"],
+    "Triceps": ["Triceps Dips", "Skull Crushers", "Triceps Pushdowns"],
+    "Back": ["Pull-Ups", "Bent-Over Rows", "Lat Pulldown"],
+    "Biceps": ["Barbell Curls", "Hammer Curls", "Concentration Curls"],
+    "Quadriceps": ["Squats", "Lunges", "Leg Press"],
+    "Hamstrings": ["Romanian Deadlifts", "Hamstring Curls", "Good Mornings"],
+    "Glutes": ["Hip Thrusts", "Glute Bridges", "Cable Kickbacks"],
+    "Calves": ["Standing Calf Raises", "Seated Calf Raises", "Donkey Calf Raises"],
+    "Forearms": ["Wrist Curls", "Reverse Curls", "Farmer's Walk"],
+}
+
+# Example usage
+selected_method = "Push-Pull-Legs"  # This would be user-selected
+workout_plan = generate_workout_plan(selected_method)
+assigned_plan = assign_exercises(workout_plan, exercise_pool)
+
+# The assigned exercises remain hidden from the user, but are stored
+print("Workout plan has been generated and saved.")
