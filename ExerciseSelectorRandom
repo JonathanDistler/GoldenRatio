@@ -1,0 +1,14 @@
+def get_random_exercises(num_exercises_per_category):
+    """
+    Selects a user-specified number of random exercises from each category.
+    
+    :param num_exercises_per_category: Number of exercises to select from each category
+    :return: Dictionary with randomly selected exercises per category
+    """
+    exercises = get_exercise_categories()
+    selected_exercises = {}
+    
+    for category, exercise_list in exercises.items():
+        selected_exercises[category] = random.sample(exercise_list, min(num_exercises_per_category, len(exercise_list)))
+    
+    return selected_exercises
